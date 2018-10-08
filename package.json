@@ -1,0 +1,6 @@
+{
+  "name": "cordova-plugin-baidu-location",
+  "version": "1.0.1",
+  "description": "Cordova Android plugin using BaiduLocation sdk",
+  "dependencies": {}
+}
