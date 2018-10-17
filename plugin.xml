@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
-  id="baiduLocation"
-  version="1.0.3">
-  <name>baiduLocation</name>
+  id="runchain-cordova-plugin-baidu-location"
+  version="1.0.4">
+  <name>runchain-cordova-plugin-baidu-location</name>
 
   <js-module src="www/baiduLocation.js" name="baiduLocation">
     <clobbers target="baiduLocation" />

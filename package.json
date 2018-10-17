@@ -1,6 +1,6 @@
 {
   "name": "runchain-cordova-plugin-baidu-location",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Cordova Android plugin using BaiduLocation sdk",
   "dependencies": {}
 }
