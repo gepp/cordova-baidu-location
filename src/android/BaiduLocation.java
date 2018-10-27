@@ -3,6 +3,13 @@ package com.runchain.plugins.baidu;
 import android.app.Activity;
 import android.widget.Toast;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.LocationClientOption.LocationMode;
+import com.baidu.location.Poi;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
@@ -11,12 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.baidu.location.BDAbstractLocationListener;
-import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
-import com.baidu.location.LocationClientOption.LocationMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,40 +68,40 @@ public class BaiduLocation extends CordovaPlugin {
       if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_BETTER_OPEN_GPS) {
 
         //建议打开GPS
-        Toast.makeText(activity,"请打开GPS！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请打开GPS！", Toast.LENGTH_SHORT).show();
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_BETTER_OPEN_WIFI) {
 
         //建议打开wifi，不必连接，这样有助于提高网络定位精度！
-        Toast.makeText(activity,"请打开wifi，这样有助于提高网络定位精度！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请打开wifi，这样有助于提高网络定位精度！", Toast.LENGTH_SHORT).show();
 
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_NEED_CHECK_LOC_PERMISSION) {
 
         //定位权限受限，建议提示用户授予APP定位权限！
-        Toast.makeText(activity,"请授予应用定位权限！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请授予应用定位权限！", Toast.LENGTH_SHORT).show();
 
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_NEED_CHECK_NET) {
 
         //网络异常造成定位失败，建议用户确认网络状态是否异常！
-        Toast.makeText(activity,"请确认网络状态是否异常！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请确认网络状态是否异常！", Toast.LENGTH_SHORT).show();
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_NEED_CLOSE_FLYMODE) {
 
         //手机飞行模式造成定位失败，建议用户关闭飞行模式后再重试定位！
-        Toast.makeText(activity,"请先关闭飞行模式！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请先关闭飞行模式！", Toast.LENGTH_SHORT).show();
 
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_NEED_INSERT_SIMCARD_OR_OPEN_WIFI) {
 
         //无法获取任何定位依据，建议用户打开wifi或者插入sim卡重试！
-        Toast.makeText(activity,"请打开wifi或者插入sim卡重试！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请打开wifi或者插入sim卡重试！", Toast.LENGTH_SHORT).show();
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_NEED_OPEN_PHONE_LOC_SWITCH) {
 
         //无法获取有效定位依据，建议用户打开手机设置里的定位开关后重试！
-        Toast.makeText(activity,"请设置里的定位开关后重试！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "请设置里的定位开关后重试！", Toast.LENGTH_SHORT).show();
 
       } else if (diagnosticType == LocationClient.LOC_DIAGNOSTIC_TYPE_SERVER_FAIL) {
 
@@ -110,10 +114,11 @@ public class BaiduLocation extends CordovaPlugin {
         //建议检查是否有安全软件屏蔽相关定位权限
         //或调用LocationClient.restart()重新启动后重试！
 
-        Toast.makeText(activity,"无法获取有效定位依据，请稍后再试！",Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "无法获取有效定位依据，请稍后再试！", Toast.LENGTH_SHORT).show();
 
       }
     }
+
     @Override
     public void onReceiveLocation(BDLocation location) {
       LOG.d(LOG_TAG, "location received..");
@@ -142,8 +147,17 @@ public class BaiduLocation extends CordovaPlugin {
         json.put("street", location.getStreet());
         json.put("streetNumber", location.getStreetNumber());
         json.put("locationDescribe", location.getLocationDescribe());
-        json.put("poiList", location.getPoiList());
 
+        List<Poi> poiList = location.getPoiList();
+        JSONArray poiArray = new JSONArray();
+        for (Poi poi : poiList) {
+          JSONObject poiObj = new JSONObject();
+          poiObj.put("id", poi.getId());
+          poiObj.put("name", poi.getName());
+          poiObj.put("rank", poi.getRank());
+          poiArray.put(poiObj);
+        }
+        json.put("poiList", poiArray);
         json.put("buildingID", location.getBuildingID());
         json.put("buildingName", location.getBuildingName());
         json.put("floor", location.getFloor());
@@ -161,16 +175,16 @@ public class BaiduLocation extends CordovaPlugin {
           json.put("describe", "离线定位成功，离线定位结果也是有效的");
         } else if (location.getLocType() == BDLocation.TypeServerError) {
           json.put("describe", "服务端网络定位失败，可将定位唯一ID、IMEI、定位失败时间反馈至loc-bugs@baidu.com");
-          code="-1";
-          message="服务端网络定位失败";
+          code = "-1";
+          message = "服务端网络定位失败";
         } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
           json.put("describe", "网络不同导致定位失败，请检查网络是否通畅");
-          code="-1";
-          message="网络不通导致定位失败，请检查网络是否通畅";
+          code = "-1";
+          message = "网络不通导致定位失败，请检查网络是否通畅";
         } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
           json.put("describe", "请授予应用定位权限");
-          code="-1";
-          message="请授予应用定位权限";
+          code = "-1";
+          message = "请授予应用定位权限";
         }
 
         resultObj.put("code", code);
@@ -289,8 +303,6 @@ public class BaiduLocation extends CordovaPlugin {
     }
     super.onDestroy();
   }
-
-
 
 
 }

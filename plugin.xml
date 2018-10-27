@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
   id="runchain-cordova-plugin-baidu-location"
-  version="1.0.4">
+  version="1.0.8">
   <name>runchain-cordova-plugin-baidu-location</name>
 
   <js-module src="www/baiduLocation.js" name="baiduLocation">
